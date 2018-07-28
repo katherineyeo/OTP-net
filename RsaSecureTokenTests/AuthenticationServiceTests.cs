@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RsaSecureToken;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+using RsaSecureToken;
+using Assert = NUnit.Framework.Assert;
+
 namespace RsaSecureToken.Tests
 {
-    [TestClass()]
+    [TestFixture]
     public class AuthenticationServiceTests
     {
-        [TestMethod()]
+        [Test()]
         public void IsValidTest()
         {
             var target = new AuthenticationService();
