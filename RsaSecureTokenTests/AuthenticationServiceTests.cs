@@ -8,22 +8,37 @@ namespace RsaSecureToken.Tests
     [TestFixture]
     public class AuthenticationServiceTests
     {
-        [Test()]
-        public void IsValidTest()
+        private readonly IProfile _fakeProfile = Substitute.For<IProfile>();
+        private readonly IToken _fakeToken = Substitute.For<IToken>();
+        private readonly AuthenticationService _target;
+
+        public AuthenticationServiceTests()
         {
-            var fakeProfile = Substitute.For<IProfile>();
-            fakeProfile.GetPassword("joey").Returns("91");
+            _target = new AuthenticationService(_fakeProfile, _fakeToken);
+        }
 
-            var fakeToken = Substitute.For<IToken>();
-            fakeToken.GetRandom("").ReturnsForAnyArgs("000000");
+        [Test()]
+        public void is_valid()
+        {
+            GivenProfile("joey", "91");
+            GivenToken("000000");
 
-            var target = new AuthenticationService(fakeProfile, fakeToken);
-            //var target = new AuthenticationService(new FakeProfile(), new FakeToken());
+            ShouldBeValid("joey", "91000000");
+        }
 
-            var actual = target.IsValid("joey", "91000000");
+        private void ShouldBeValid(string account, string password)
+        {
+            Assert.IsTrue(_target.IsValid(account, password));
+        }
 
-            //always failed
-            Assert.IsTrue(actual);
+        private void GivenToken(string token)
+        {
+            _fakeToken.GetRandom("").ReturnsForAnyArgs(token);
+        }
+
+        private void GivenProfile(string account, string password)
+        {
+            _fakeProfile.GetPassword(account).Returns(password);
         }
     }
 }
