@@ -7,17 +7,20 @@ namespace RsaSecureToken
     {
         private readonly IProfile _profile;
         private readonly IToken _token;
+        private ILog _log;
 
         public AuthenticationService()
         {
             _profile = new ProfileDao();
             _token = new RsaTokenDao();
+            _log = new ConsoleLog();
         }
 
-        public AuthenticationService(IProfile profile, IToken token)
+        public AuthenticationService(IProfile profile, IToken token, ILog log)
         {
             _profile = profile;
             _token = token;
+            _log = log;
         }
 
         public bool IsValid(string account, string password)
@@ -38,9 +41,25 @@ namespace RsaSecureToken
             }
             else
             {
+                // todo, 如何驗證當有非法登入的情況發生時，有正確地記錄log？
+                var content = $"account:{account} try to login failed";
+                this._log.Save(content);
                 return false;
             }
         }
+    }
+
+    public class ConsoleLog : ILog
+    {
+        public void Save(string message)
+        {
+            Console.WriteLine(message);
+        }
+    }
+
+    public interface ILog
+    {
+        void Save(string message);
     }
 
     public interface IProfile
