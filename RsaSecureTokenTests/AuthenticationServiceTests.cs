@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using NSubstitute;
+using NUnit.Framework;
 using RsaSecureToken;
 using Assert = NUnit.Framework.Assert;
 
@@ -10,8 +11,14 @@ namespace RsaSecureToken.Tests
         [Test()]
         public void IsValidTest()
         {
-            var target = new AuthenticationService(new FakeProfile(), new FakeToken());
-            //var target = new AuthenticationService();
+            var fakeProfile = Substitute.For<IProfile>();
+            fakeProfile.GetPassword("joey").Returns("91");
+
+            var fakeToken = Substitute.For<IToken>();
+            fakeToken.GetRandom("").ReturnsForAnyArgs("000000");
+
+            var target = new AuthenticationService(fakeProfile, fakeToken);
+            //var target = new AuthenticationService(new FakeProfile(), new FakeToken());
 
             var actual = target.IsValid("joey", "91000000");
 
