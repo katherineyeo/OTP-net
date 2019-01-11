@@ -30,17 +30,13 @@ namespace RsaSecureToken.Tests
         [Test()]
         public void IsValidTest_如何驗證當非法登入時有正確紀錄log()
         {
-            // 試著使用 stub object 的 ReturnsForAnyArgs() 方法
-            //例如：profile.GetPassword("").ReturnsForAnyArgs("91"); // 不管GetPassword()傳入任何參數，都要回傳 "91"
+            GivenProfile("joey", "91");
+            GivenToken("000000");
 
-            // step 1: arrange, 建立 mock object
-            // ILog log = Substitute.For<ILog>();
+            _target.IsValid("joey", "wrong password");
 
-            // step 2: act
-
-            // step 3: assert, mock object 是否有正確互動
-            //log.Received(1).Save("account:Joey try to login failed"); //Received(1) 可以簡化成 Received()
-            Assert.Fail();
+            _fakeLog.Received(1).Save(Arg.Is<string>(m => m.Contains("joey") && m.Contains("login failed")));
+            //_fakeLog.Received(1).Save("account:joey try to login failed");
         }
 
         private void ShouldBeValid(string account, string password)
