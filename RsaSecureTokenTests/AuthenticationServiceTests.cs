@@ -8,13 +8,17 @@ namespace RsaSecureToken.Tests
     [TestFixture]
     public class AuthenticationServiceTests
     {
-        private readonly IProfile _fakeProfile = Substitute.For<IProfile>();
-        private readonly IToken _fakeToken = Substitute.For<IToken>();
-        private readonly AuthenticationService _target;
-        private readonly ILog _fakeLog = Substitute.For<ILog>();
+        private IProfile _fakeProfile;
+        private IToken _fakeToken;
+        private AuthenticationService _target;
+        private ILog _fakeLog;
 
-        public AuthenticationServiceTests()
+        [SetUp]
+        public void Setup()
         {
+            _fakeProfile = Substitute.For<IProfile>();
+            _fakeToken = Substitute.For<IToken>();
+            _fakeLog = Substitute.For<ILog>();
             _target = new AuthenticationService(_fakeProfile, _fakeToken, _fakeLog);
         }
 
@@ -28,15 +32,46 @@ namespace RsaSecureToken.Tests
         }
 
         [Test()]
-        public void IsValidTest_如何驗證當非法登入時有正確紀錄log()
+        public void should_log_when_invalid()
         {
             GivenProfile("joey", "91");
             GivenToken("000000");
 
-            _target.IsValid("joey", "wrong password");
+            WhenInvalid();
 
-            _fakeLog.Received(1).Save(Arg.Is<string>(m => m.Contains("joey") && m.Contains("login failed")));
+            ShouldLogWith("joey", "login failed");
+        }
+
+        [Test()]
+        public void should_not_log_when_valid()
+        {
+            GivenProfile("joey", "91");
+            GivenToken("000000");
+
+            WhenValid();
+
+            ShouldNotLog();
+        }
+
+        private void ShouldNotLog()
+        {
+            _fakeLog.DidNotReceiveWithAnyArgs().Save(Arg.Any<string>());
+        }
+
+        private void WhenValid()
+        {
+            _target.IsValid("joey", "91000000");
+        }
+
+        private void ShouldLogWith(string account, string status)
+        {
+            _fakeLog.Received().Save(Arg.Is<string>(m => m.Contains(account) && m.Contains(status)));
             //_fakeLog.Received(1).Save("account:joey try to login failed");
+        }
+
+        private void WhenInvalid()
+        {
+            _target.IsValid("joey", "wrong password");
         }
 
         private void ShouldBeValid(string account, string password)
