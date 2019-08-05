@@ -14,14 +14,14 @@ namespace RsaSecureToken.Tests
     public class AuthenticationServiceTests
     {
         [Test()]
-        public void IsValidTest()
+        public void is_valid()
         {
             var target = new AuthenticationService();
 
             var actual = target.IsValid("joey", "91000000");
 
             //always failed
-            Assert.IsTrue(actual);                       
+            Assert.IsTrue(actual);
         }
     }
 }
