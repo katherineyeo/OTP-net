@@ -7,6 +7,7 @@ namespace RsaSecureToken
     {
         public bool IsValid(string account, string password)
         {
+            
             // 根據 account 取得自訂密碼
             var profileDao = new ProfileDao();
             var passwordFromDao = profileDao.GetPassword(account);
